@@ -90,7 +90,7 @@ public class SkyWalkingAgent {
             LOGGER.error(e, "SkyWalking agent initialized failure. Shutting down.");
             return;
         }
-
+        //byte-buddy是一个字节码生成和操作库
         final ByteBuddy byteBuddy = new ByteBuddy().with(TypeValidation.of(Config.Agent.IS_OPEN_DEBUGGING_CLASS));
 
         AgentBuilder agentBuilder = new AgentBuilder.Default(byteBuddy).ignore(

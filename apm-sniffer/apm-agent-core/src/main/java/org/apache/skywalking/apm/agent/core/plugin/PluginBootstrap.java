@@ -39,9 +39,12 @@ public class PluginBootstrap {
      * @return plugin definition list.
      */
     public List<AbstractClassEnhancePluginDefine> loadPlugins() throws AgentPackageNotFoundException {
+        //可以通过启动一次看日志，了解这里是先装载再识别出def
+        //注意，这里自定义了一个类加载器,并且加载了/activations/plugins下的jar包
         AgentClassLoader.initDefaultLoader();
 
         PluginResourcesResolver resolver = new PluginResourcesResolver();
+        //获取所有的skywalking-plugin.def，由于上面的jar包已经添加，所以实际就是那些jar包里的skywalking-plugin.def
         List<URL> resources = resolver.getResources();
 
         if (resources == null || resources.size() == 0) {

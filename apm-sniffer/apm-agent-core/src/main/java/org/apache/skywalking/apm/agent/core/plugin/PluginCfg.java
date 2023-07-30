@@ -52,6 +52,7 @@ public enum PluginCfg {
                     LOGGER.error(e, "Failed to format plugin({}) define.", pluginDefine);
                 }
             }
+            //可以排除插件
             pluginClassList = pluginSelector.select(pluginClassList);
         } finally {
             input.close();
