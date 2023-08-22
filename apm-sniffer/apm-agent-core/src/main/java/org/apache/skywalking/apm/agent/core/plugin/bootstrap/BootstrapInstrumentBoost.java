@@ -87,7 +87,7 @@ public class BootstrapInstrumentBoost {
     public static AgentBuilder inject(PluginFinder pluginFinder, Instrumentation instrumentation,
         AgentBuilder agentBuilder, JDK9ModuleExporter.EdgeClasses edgeClasses) throws PluginException {
         Map<String, byte[]> classesTypeMap = new LinkedHashMap<>();
-
+        //这两个方法都似乎是在处理bootstrap相关的类
         if (!prepareJREInstrumentation(pluginFinder, classesTypeMap)) {
             return agentBuilder;
         }
@@ -116,6 +116,7 @@ public class BootstrapInstrumentBoost {
          */
         ClassInjector.UsingUnsafe.Factory factory = ClassInjector.UsingUnsafe.Factory.resolve(instrumentation);
         factory.make(null, null).injectRaw(classesTypeMap);
+        //实际在这个地方注入了所有需要注入到引导类加载器对应的类
         agentBuilder = agentBuilder.with(new AgentBuilder.InjectionStrategy.UsingUnsafe.OfFactory(factory));
 
         return agentBuilder;

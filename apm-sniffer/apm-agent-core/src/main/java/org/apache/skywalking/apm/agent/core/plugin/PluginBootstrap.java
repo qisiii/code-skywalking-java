@@ -54,6 +54,7 @@ public class PluginBootstrap {
 
         for (URL pluginUrl : resources) {
             try {
+                //最终都加载到了List<PluginDefine> pluginClassList里
                 PluginCfg.INSTANCE.load(pluginUrl.openStream());
             } catch (Throwable t) {
                 LOGGER.error(t, "plugin file [{}] init failure.", pluginUrl);
@@ -61,11 +62,14 @@ public class PluginBootstrap {
         }
 
         List<PluginDefine> pluginClassList = PluginCfg.INSTANCE.getPluginClassList();
-
+        //从这里往下的暂时没有看懂
         List<AbstractClassEnhancePluginDefine> plugins = new ArrayList<AbstractClassEnhancePluginDefine>();
         for (PluginDefine pluginDefine : pluginClassList) {
             try {
                 LOGGER.debug("loading plugin class {}.", pluginDefine.getDefineClass());
+                //Q&A 2023/8/22
+                // Q:为什么这里所有的类都能强转为AbstractClassEnhancePluginDefine
+                // A:因为插件继承的顶层最终都是这个抽象类
                 AbstractClassEnhancePluginDefine plugin = (AbstractClassEnhancePluginDefine) Class.forName(pluginDefine.getDefineClass(), true, AgentClassLoader
                     .getDefault()).newInstance();
                 plugins.add(plugin);
@@ -73,7 +77,7 @@ public class PluginBootstrap {
                 LOGGER.error(t, "load plugin [{}] failure.", pluginDefine.getDefineClass());
             }
         }
-
+        //这个是通过SPI用所有的InstrumentationLoader来添加AbstractClassEnhancePluginDefine，不知道用在哪
         plugins.addAll(DynamicPluginLoader.INSTANCE.load(AgentClassLoader.getDefault()));
 
         return plugins;

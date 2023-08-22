@@ -65,6 +65,7 @@ public class SkyWalkingAgent {
     public static void premain(String agentArgs, Instrumentation instrumentation) throws PluginException {
         final PluginFinder pluginFinder;
         try {
+            //将各个途径的配置都处理汇总到CONFIG类里，里面全是静态字段，所以直接赋值也不需要实例化对象
             SnifferConfigInitializer.initializeCoreConfig(agentArgs);
         } catch (Exception e) {
             // try to resolve a new logger, and use the new logger to write the error log here
@@ -82,6 +83,7 @@ public class SkyWalkingAgent {
         }
 
         try {
+            //这一步实际上是加载了插件jar包里的增加类def里面描述的类，最终都传到了PluginFinder，存储为三种不同的对象
             pluginFinder = new PluginFinder(new PluginBootstrap().loadPlugins());
         } catch (AgentPackageNotFoundException ape) {
             LOGGER.error(ape, "Locate agent.jar failure. Shutting down.");
@@ -92,7 +94,7 @@ public class SkyWalkingAgent {
         }
         //byte-buddy是一个字节码生成和操作库
         final ByteBuddy byteBuddy = new ByteBuddy().with(TypeValidation.of(Config.Agent.IS_OPEN_DEBUGGING_CLASS));
-
+        //bytebuddy提供的更便捷的工具
         AgentBuilder agentBuilder = new AgentBuilder.Default(byteBuddy).ignore(
             nameStartsWith("net.bytebuddy.")
                 .or(nameStartsWith("org.slf4j."))
@@ -103,7 +105,9 @@ public class SkyWalkingAgent {
                 .or(nameStartsWith("sun.reflect"))
                 .or(allSkyWalkingAgentExcludeToolkit())
                 .or(ElementMatchers.isSynthetic()));
-
+        //Q&A 2023/8/14
+        // Q: 这里好像是jdk9开始引入的模块化的概念，需要了解学习
+        // A:
         JDK9ModuleExporter.EdgeClasses edgeClasses = new JDK9ModuleExporter.EdgeClasses();
         try {
             agentBuilder = BootstrapInstrumentBoost.inject(pluginFinder, instrumentation, agentBuilder, edgeClasses);
@@ -113,6 +117,9 @@ public class SkyWalkingAgent {
         }
 
         try {
+            //Q&A 2023/8/14
+            // Q: 先不看，毕竟不懂模块
+            // A:
             agentBuilder = JDK9ModuleExporter.openReadEdge(instrumentation, agentBuilder, edgeClasses);
         } catch (Exception e) {
             LOGGER.error(e, "SkyWalking agent open read edge in JDK 9+ failure. Shutting down.");
@@ -128,15 +135,15 @@ public class SkyWalkingAgent {
             }
         }
 
-        agentBuilder.type(pluginFinder.buildMatch())
-                    .transform(new Transformer(pluginFinder))
+        agentBuilder.type(pluginFinder.buildMatch())//type是命中要处理的类
+                    .transform(new Transformer(pluginFinder))//transform是实际要做的修改,准确的说define的enhance
                     .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                     .with(new RedefinitionListener())
                     .with(new Listener())
                     .installOn(instrumentation);
 
         PluginFinder.pluginInitCompleted();
-
+        //以上部分主要是注入工作，下面这个猜测主要是上报
         try {
             ServiceManager.INSTANCE.boot();
         } catch (Exception e) {

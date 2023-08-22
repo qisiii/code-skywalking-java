@@ -52,7 +52,7 @@ public class PluginFinder {
             if (match == null) {
                 continue;
             }
-
+            //重写enhanceClass，以restTemplate为例，NameMatch.byName("org.springframework.web.client.RestTemplate")
             if (match instanceof NameMatch) {
                 NameMatch nameMatch = (NameMatch) match;
                 LinkedList<AbstractClassEnhancePluginDefine> pluginDefines = nameMatchDefine.get(nameMatch.getClassName());
@@ -88,6 +88,10 @@ public class PluginFinder {
         return matchedPlugins;
     }
 
+    /**
+     * 主要是通过插件里定义的NameMatch和IndirectMatch来匹配，IndirectMatch就是要更复杂，比如匹配的更多，前缀，后缀之类的，参考IndirectMatch的实现类
+     * @return
+     */
     public ElementMatcher<? super TypeDescription> buildMatch() {
         ElementMatcher.Junction judge = new AbstractJunction<NamedElement>() {
             @Override

@@ -68,6 +68,7 @@ public abstract class AbstractClassEnhancePluginDefine {
 
         LOGGER.debug("prepare to enhance class {} by {}.", transformClassName, interceptorDefineClassName);
         WitnessFinder finder = WitnessFinder.INSTANCE;
+        //witness感觉更像是在加载某类之前，必须有些类已经加载
         /**
          * find witness classes for enhance class
          */
@@ -110,6 +111,7 @@ public abstract class AbstractClassEnhancePluginDefine {
      */
     protected DynamicType.Builder<?> enhance(TypeDescription typeDescription, DynamicType.Builder<?> newClassBuilder,
                                              ClassLoader classLoader, EnhanceContext context) throws PluginException {
+        //这里是实际和插件作用的地方
         newClassBuilder = this.enhanceClass(typeDescription, newClassBuilder, classLoader);
 
         newClassBuilder = this.enhanceInstance(typeDescription, newClassBuilder, classLoader, context);

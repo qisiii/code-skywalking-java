@@ -46,6 +46,11 @@ public enum PluginCfg {
                     if (pluginDefine.trim().length() == 0 || pluginDefine.startsWith("#")) {
                         continue;
                     }
+                    //e.g.
+                    //spring-mvc-annotation-3.x=org.apache.skywalking.apm.plugin.spring.mvc.v3.define.ControllerInstrumentation
+                    //spring-mvc-annotation-3.x=org.apache.skywalking.apm.plugin.spring.mvc.v3.define.HandlerMethodInstrumentation
+                    //spring-mvc-annotation-3.x=org.apache.skywalking.apm.plugin.spring.mvc.v3.define.InvocableHandlerInstrumentation
+                    //spring-mvc-annotation-3.x=org.apache.skywalking.apm.plugin.spring.mvc.v3.define.HandlerMethodInvokerInstrumentation
                     PluginDefine plugin = PluginDefine.build(pluginDefine);
                     pluginClassList.add(plugin);
                 } catch (IllegalPluginDefineException e) {
