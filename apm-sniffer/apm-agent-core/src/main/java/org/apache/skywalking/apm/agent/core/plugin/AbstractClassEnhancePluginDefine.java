@@ -68,7 +68,9 @@ public abstract class AbstractClassEnhancePluginDefine {
 
         LOGGER.debug("prepare to enhance class {} by {}.", transformClassName, interceptorDefineClassName);
         WitnessFinder finder = WitnessFinder.INSTANCE;
-        //witness感觉更像是在加载某类之前，必须有些类已经加载
+        //witness机制
+        // 如果必须在特定的版本中激活工具，则设置 witessClass 和/或 witessMethod。
+        // 必须已经存在指定类或者方法之后，才能让某些插件起效
         /**
          * find witness classes for enhance class
          */

@@ -41,6 +41,9 @@ public class PluginBootstrap {
     public List<AbstractClassEnhancePluginDefine> loadPlugins() throws AgentPackageNotFoundException {
         //可以通过启动一次看日志，了解这里是先装载再识别出def
         //注意，这里自定义了一个类加载器,并且加载了/activations/plugins下的jar包
+        //Q&A 2023/8/27
+        // Q:为什么要自定义类加载器
+        // A:为了加载插件的那些jar包，继承自AppClassLodder
         AgentClassLoader.initDefaultLoader();
 
         PluginResourcesResolver resolver = new PluginResourcesResolver();

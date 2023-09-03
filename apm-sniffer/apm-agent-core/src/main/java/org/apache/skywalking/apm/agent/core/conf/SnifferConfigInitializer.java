@@ -245,7 +245,7 @@ public class SnifferConfigInitializer {
      * @return the config file {@link InputStream}, or null if not needEnhance.
      */
     private static InputStreamReader loadConfig() throws AgentPackageNotFoundException, ConfigNotFoundException {
-        //从系统属性里取自定义路径或者从默认路径/config/agent.config初始化配置
+        //从系统属性（即 java -Dskywalking_config=xxx/custom.config）里取自定义配置或者从默认路径/config/agent.config初始化配置
         String specifiedConfigPath = System.getProperty(SPECIFIED_CONFIG_PATH);
         File configFile = StringUtil.isEmpty(specifiedConfigPath) ? new File(
             AgentPackagePath.getPath(), DEFAULT_CONFIG_FILE_NAME) : new File(specifiedConfigPath);

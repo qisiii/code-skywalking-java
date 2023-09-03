@@ -140,7 +140,7 @@ public class TraceSegment {
 
     /**
      * This is a high CPU cost method, only called when sending to collector or test cases.
-     *
+     * 在这里对span进行封装，通过消费者线程池进行消费发送到oap
      * @return the segment as GRPC service parameter
      */
     public SegmentObject transform() {

@@ -96,6 +96,10 @@ public abstract class ClassEnhancePluginDefine extends AbstractClassEnhancePlugi
          * And make sure the source codes manipulation only occurs once.
          *
          */
+        //生成一个新的类，该类继承EnhancedInstance接口，并且自定义了一个字段叫做_$EnhancedClassField_ws，同时生成了这个的set、get方法
+        //Q&A 2023/8/29
+        // Q: 为什么非要指定这样一个字段呢？
+        // A: 说是为了解决上下文问题，需要这样一个字段缓存，但是我不理解 https://github.com/apache/skywalking/issues/7146
         if (!typeDescription.isAssignableTo(EnhancedInstance.class)) {
             if (!context.isObjectExtended()) {
                 newClassBuilder = newClassBuilder.defineField(
@@ -105,6 +109,10 @@ public abstract class ClassEnhancePluginDefine extends AbstractClassEnhancePlugi
                 context.extendObjectCompleted();
             }
         }
+        //下面的增强构造和实例方法其实很类似
+        //核心点在于InstanceMethodsInterceptPoint，
+        //通过getMethodsMatcher获取需要加强的方法
+        //通过getMethodsInterceptor获取需要插件定义的拦截器，然后将其构造到agentBuilder里
 
         /**
          * 2. enhance constructors
@@ -112,6 +120,7 @@ public abstract class ClassEnhancePluginDefine extends AbstractClassEnhancePlugi
         if (existedConstructorInterceptPoint) {
             for (ConstructorInterceptPoint constructorInterceptPoint : constructorInterceptPoints) {
                 if (isBootstrapInstrumentation()) {
+                    //看不懂具体的intercept的原理，但目前也不关心
                     newClassBuilder = newClassBuilder.constructor(constructorInterceptPoint.getConstructorMatcher())
                                                      .intercept(SuperMethodCall.INSTANCE.andThen(MethodDelegation.withDefaultConfiguration()
                                                                                                                  .to(BootstrapInstrumentBoost
